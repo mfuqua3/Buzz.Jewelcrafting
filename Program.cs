@@ -51,7 +51,9 @@ services.AddDbContext<BuzzDbContext>(opt =>
     opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
 });
 
-services.AddScoped<DesignService>();
+services
+    .AddScoped<UserActionService>()
+    .AddScoped<DesignService>();
 
 var app = builder.Build();
 
