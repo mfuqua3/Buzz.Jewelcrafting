@@ -1,17 +1,59 @@
+using System.Security.Claims;
+using AspNet.Security.OAuth.Discord;
+using Buzz.Jewelcrafting.Data;
+using Buzz.Jewelcrafting.Data.Entities;
+using Buzz.Jewelcrafting.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Host.UseSerilog((ctx, lc) =>
+{
+    lc.ReadFrom.Configuration(ctx.Configuration);
+});
 // Add services to the container.
+var config = builder.Configuration;
+var discordOptions = config.GetSection("Discord")
+    .Get<DiscordAuthenticationOptions>();
+var services = builder.Services;
+services.AddHealthChecks();
+services.AddAuthorization();
+services.AddControllers();
+services.AddAuthentication(opt =>
+    {
+        opt.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        opt.DefaultChallengeScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddDiscord(opt =>
+    {
+        opt.ClientId = discordOptions.ClientId;
+        opt.ClientSecret = discordOptions.ClientSecret;
+        opt.SaveTokens = true;
+        opt.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, opt =>
+    {
+        opt.Cookie.Name = "Buzz.Jewelcrafting.Application";
+        opt.Events.OnSigningIn = async context =>
+        {
+            var userId = context.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var username = context.Principal.FindFirstValue(ClaimTypes.Name);
+            var database = context.HttpContext.RequestServices.GetRequiredService<BuzzDbContext>();
+            var userExists = await database.Users.AnyAsync(x => x.Id == userId);
+            if(userExists)return;
+            await database.Users.AddAsync(new BuzzUser { Id = userId, Name = username });
+            await database.SaveChangesAsync();
+        };
+    });
+services.AddDbContext<BuzzDbContext>(opt =>
+{
+    opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
+});
 
-builder.Services.AddControllersWithViews();
+services.AddScoped<DesignService>();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -19,11 +61,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller}/{action=Index}/{id?}");
-
+app.MapHealthChecks("/health");
+app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();

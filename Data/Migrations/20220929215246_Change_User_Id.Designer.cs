@@ -3,6 +3,7 @@ using System;
 using Buzz.Jewelcrafting.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Buzz.Jewelcrafting.Migrations
 {
     [DbContext(typeof(BuzzDbContext))]
-    partial class BuzzDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220929215246_Change_User_Id")]
+    partial class Change_User_Id
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

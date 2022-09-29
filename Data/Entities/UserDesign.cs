@@ -5,7 +5,7 @@ namespace Buzz.Jewelcrafting.Data.Entities;
 
 public class UserDesign : ITracked
 {
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     public int DesignId { get; set; }
     public string Status { get; set; }
     public DateTime CreatedAt { get; set; }
