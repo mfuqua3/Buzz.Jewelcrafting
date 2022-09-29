@@ -8,6 +8,6 @@ public class GemCutSeeder : IEntityTypeConfiguration<GemCut>
 {
     public void Configure(EntityTypeBuilder<GemCut> builder)
     {
-        builder.HasData(DesignSeed.Designs.Where(x=>x.GemCut != null).Select(x=>x.GemCut));
+        builder.HasData(DesignSeed.Designs.Where(x=>x.GemCut != null).Select(x=>x.GemCut).ToArray());
     }
 }

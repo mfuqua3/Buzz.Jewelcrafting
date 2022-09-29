@@ -24,4 +24,11 @@ public class BuzzDbContext : DbContext
         modelBuilder.ApplySoftDeleteQueryFilters();
         base.OnModelCreating(modelBuilder);
     }
+    
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = new())
+    {
+        this.ProcessCustomInterfaces();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
 }

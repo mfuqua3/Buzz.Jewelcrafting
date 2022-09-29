@@ -111,6 +111,7 @@ public static class DesignSeed
             Id = _cutIds++,
             ItemId = itemId,
             IconName = iconName,
+            Name = designParams.Name,
             Stat1 = stat1,
             Stat2 = stat2,
             Color = color.ToString()

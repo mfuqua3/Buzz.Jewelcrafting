@@ -8,27 +8,21 @@ public class DesignSeeder : IEntityTypeConfiguration<Design>
 {
     public void Configure(EntityTypeBuilder<Design> builder)
     {
-        builder.HasData(GetSeed());
+        builder.HasData(DesignSeed.Designs.Select(Clone).ToArray());
     }
 
-    private IEnumerable<Design> GetSeed()
-    {
-        var designs = DesignSeed.Designs;
-        foreach (var design in designs)
-        {
-            if (design.GemCut != null)
-            {
-                design.GemCutId = design.GemCut.Id;
-                design.GemCut = null;
-                yield return design;
-            }
 
-            if (design.Jewelry != null)
-            {
-                design.JewelryId = design.Jewelry.Id;
-                design.Jewelry = null;
-                yield return design;
-            }
-        }
+    private Design Clone(Design from)
+    {
+        return new Design
+        {
+            Id = from.Id,
+            Cost = from.Cost,
+            Source = from.Source,
+            ItemId = from.ItemId,
+            GemCutId = from.GemCut?.Id,
+            JewelryId = from.Jewelry?.Id,
+            Name = from.Name
+        };
     }
 }

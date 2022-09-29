@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Buzz.Jewelcrafting.Migrations
 {
     [DbContext(typeof(BuzzDbContext))]
-    [Migration("20220929203935_Init")]
+    [Migration("20220929204413_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -139,8 +139,8 @@ namespace Buzz.Jewelcrafting.Migrations
 
             modelBuilder.Entity("Buzz.Jewelcrafting.Data.Entities.UserDesign", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("DesignId")
                         .HasColumnType("integer");
@@ -154,14 +154,9 @@ namespace Buzz.Jewelcrafting.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("UserId1")
-                        .HasColumnType("integer");
-
                     b.HasKey("UserId", "DesignId");
 
                     b.HasIndex("DesignId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("UserDesigns");
                 });
@@ -191,7 +186,9 @@ namespace Buzz.Jewelcrafting.Migrations
 
                     b.HasOne("Buzz.Jewelcrafting.Data.Entities.BuzzUser", "User")
                         .WithMany("UserDesigns")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Design");
 

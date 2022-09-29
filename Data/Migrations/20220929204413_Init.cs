@@ -91,12 +91,11 @@ namespace Buzz.Jewelcrafting.Migrations
                 name: "UserDesigns",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
                     DesignId = table.Column<int>(type: "integer", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UserId1 = table.Column<int>(type: "integer", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -108,10 +107,11 @@ namespace Buzz.Jewelcrafting.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserDesigns_Users_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_UserDesigns_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -128,11 +128,6 @@ namespace Buzz.Jewelcrafting.Migrations
                 name: "IX_UserDesigns_DesignId",
                 table: "UserDesigns",
                 column: "DesignId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserDesigns_UserId1",
-                table: "UserDesigns",
-                column: "UserId1");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
