@@ -3,7 +3,9 @@ using AspNet.Security.OAuth.Discord;
 using Buzz.Jewelcrafting.Data;
 using Buzz.Jewelcrafting.Data.Entities;
 using Buzz.Jewelcrafting.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 namespace Buzz.Jewelcrafting;
@@ -64,6 +66,10 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedProto
+        });
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
