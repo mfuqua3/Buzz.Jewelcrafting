@@ -9,7 +9,16 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.UseSerilog((ctx, lc) => { lc.ReadFrom.Configuration(ctx.Configuration); });
+builder.Host
+    .ConfigureWebHostDefaults(webBuilder =>
+    {
+        var port = Environment.GetEnvironmentVariable("PORT");
+        if (!string.IsNullOrEmpty(port))
+        {
+            webBuilder.UseUrls($"https://*:{port}");
+        }
+    })
+    .UseSerilog((ctx, lc) => { lc.ReadFrom.Configuration(ctx.Configuration); });
 // Add services to the container.
 var config = builder.Configuration;
 var discordOptions = config.GetSection("Discord")
