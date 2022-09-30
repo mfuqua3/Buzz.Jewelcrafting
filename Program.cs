@@ -7,7 +7,7 @@ Host.CreateDefaultBuilder()
         var port = Environment.GetEnvironmentVariable("PORT");
         if (!string.IsNullOrEmpty(port))
         {
-            webBuilder.UseUrls($"https://*:{port}");
+            webBuilder.UseUrls($"http://*:{port}");
         }
 
         webBuilder.UseStartup<Startup>();
