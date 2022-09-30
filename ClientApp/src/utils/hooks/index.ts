@@ -10,6 +10,5 @@ export * from "./useDebouce";
 export * from "./useLocalStorage";
 export * from "./useNullableContext";
 export * from "./useOidcEnvironmentConfiguration";
-export * from "./usePagination";
 export * from "./useSessionStorage";
 export * from "./useWowClasses";

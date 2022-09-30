@@ -1,11 +1,8 @@
-import {AuthState} from "./AuthState";
-import {AuthContext} from "./AuthContext";
-import {useContext} from "react";
+import React from "react";
+import {AuthContext} from "./AuthProvider";
 
-export function useAuth(): AuthState {
-    const state = useContext(AuthContext);
-    if (state === null) {
-        throw new Error("useAuth hook may only be used with an AuthProvider");
-    }
-    return state;
+export function useAuth() {
+    const auth = React.useContext(AuthContext);
+    if(auth === null) throw Error("No Auth Provider");
+    return auth;
 }

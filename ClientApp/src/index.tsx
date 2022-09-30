@@ -1,9 +1,7 @@
 import React from "react";
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter} from "react-router-dom";
-import "./index.css";
 import App from "./App";
-import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import {CssBaseline, ThemeProvider} from "@mui/material";
 import {defaultTheme} from "./themes/defaultTheme";
@@ -12,6 +10,7 @@ import {SnackbarProvider} from "./utils/snackbar";
 import ModalProvider from "./utils/modal/ModalProvider";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import DrawerProvider from "./utils/drawer/DrawerProvider";
+import AuthProvider from "./utils/auth/AuthProvider";
 
 const baseUrl = document.getElementsByTagName("base")[0].getAttribute("href");
 const rootElement = document.getElementById("root");
@@ -21,8 +20,9 @@ root.render(
     <React.StrictMode>
         <LocalizationProvider dateAdapter={AdapterMoment}>
             <ThemeProvider theme={defaultTheme}>
-                    <CssBaseline/>
-                    <BrowserRouter basename={baseUrl ?? undefined}>
+                <CssBaseline/>
+                <BrowserRouter basename={baseUrl ?? undefined}>
+                    <AuthProvider>
                         <SnackbarProvider>
                             <ModalProvider>
                                 <DrawerProvider>
@@ -30,7 +30,8 @@ root.render(
                                 </DrawerProvider>
                             </ModalProvider>
                         </SnackbarProvider>
-                    </BrowserRouter>
+                    </AuthProvider>
+                </BrowserRouter>
             </ThemeProvider>
         </LocalizationProvider>
     </React.StrictMode>
@@ -40,7 +41,3 @@ root.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://cra.link/PWA
 serviceWorkerRegistration.unregister();
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

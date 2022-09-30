@@ -1,9 +1,8 @@
-import {User, UserManager} from "oidc-client-ts";
+import {User} from "../../domain/models/User";
 
 export interface AuthState {
-    userManager: UserManager;
-    user: User | null;
     isAuthenticated: boolean;
     loading: boolean;
-    error?: unknown;
+    user: User | null;
+    loginRedirect(redirectUrl: string): void;
 }

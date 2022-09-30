@@ -31,13 +31,13 @@ public class DesignsController : ApiController
         switch (status)
         {
             case Owned:
-                await _userActionService.SetAsOwned(userId, id);
+                await _userActionService.SetStatus(userId, id, status);
                 return NoContent();
             case Pending:
-                await _userActionService.SetAsPending(userId, id);
+                await _userActionService.SetStatus(userId, id, status);
                 return NoContent();
             case Unowned:
-                await _userActionService.SetAsUnowned(userId, id);
+                await _userActionService.SetStatus(userId, id, status);
                 return NoContent();
             default:
                 throw new ArgumentException("Unknown status type, can not execute endpoint", nameof(status));

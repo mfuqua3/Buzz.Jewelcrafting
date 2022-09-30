@@ -1,5 +1,6 @@
 ﻿using Buzz.Jewelcrafting.Data;
 using Buzz.Jewelcrafting.Models;
+using Buzz.Jewelcrafting.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Buzz.Jewelcrafting.Services;
@@ -22,9 +23,9 @@ public class DesignService
             .ToListAsync();
         summary.GemCuts = designs
             .Where(x => x.GemCut != null)
-            .OrderBy(x=>x.GemCut.Hybrid)
-            .ThenBy(x=>x.GemCut.Color)
-            .ThenBy(x=>x.GemCut.Name)
+            .OrderBy(x => x.GemCut.Hybrid)
+            .ThenBy(x => x.GemCut.Color)
+            .ThenBy(x => x.GemCut.Name)
             .Select(x => new GemCutItem
             {
                 Id = x.Id,
@@ -40,8 +41,8 @@ public class DesignService
             }).ToList();
         summary.Jewelry = designs
             .Where(x => x.Jewelry != null)
-            .OrderBy(x=>x.Jewelry.InventorySlot)
-            .ThenBy(x=>x.Jewelry.Name)
+            .OrderBy(x => x.Jewelry.InventorySlot)
+            .ThenBy(x => x.Jewelry.Name)
             .Select(x => new JewelryItem
             {
                 Id = x.Id,
@@ -53,6 +54,22 @@ public class DesignService
                 DesignIconName = x.IconName,
                 InventorySlot = x.Jewelry.InventorySlot
             }).ToList();
+        summary.UserStatusList = await _dbContext.Users
+            .OrderBy(x => x.Name)
+            .Select(x => new UserStatus
+            {
+                UserId = x.Id,
+                Username = x.Name,
+                PendingItems = x.UserDesigns
+                    .Where(d => d.Status == UserDesignStatus.Pending)
+                    .Select(d => d.Design.ItemId)
+                    .ToList(),
+                OwnedItems = x.UserDesigns
+                    .Where(d => d.Status == UserDesignStatus.Owned)
+                    .Select(d => d.Design.ItemId)
+                    .ToList(),
+            })
+            .ToListAsync();
         return summary;
     }
 }

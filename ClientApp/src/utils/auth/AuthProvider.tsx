@@ -1,68 +1,49 @@
-import {User, UserManager, UserManagerSettings} from "oidc-client-ts";
 import React, {ReactNode, useEffect, useState} from "react";
-import {AuthContext} from "./AuthContext";
-import AxiosConfig from "./AxiosConfig";
-import SilentRefresh from "./SilentRefresh";
+import {AuthState} from "./AuthState";
+import axios from "axios";
+import {User} from "../../domain/models/User";
+import {isAxiosError} from "../guards";
 
-type AuthenticationState = "Initializing" | "Unauthenticated" | "Authenticated";
+export const AuthContext = React.createContext<AuthState | null>(null);
+const apiRoot = process.env.REACT_APP_API_ROOT;
 
-function AuthProvider({children, ...userManagerSettings}: UserManagerSettings & { children: ReactNode }) {
-    const [userManager] = useState(
-        new UserManager({
-            ...userManagerSettings,
-            accessTokenExpiringNotificationTimeInSeconds: 600,
-            automaticSilentRenew: true,
-        }),
-    );
-    const [authenticationState, setAuthenticationState] = useState<AuthenticationState>("Initializing");
-    const [user, setUser] = useState<User | null | undefined>(undefined);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState();
+function AuthProvider({children}: { children: ReactNode }) {
+    const [authState, setAuthState] = useState<Omit<AuthState, "loginRedirect">>({
+        loading: true,
+        isAuthenticated: false,
+        user: null
+    });
     useEffect(() => {
-        if (user === undefined) {
+        initializeProvider()
+            .catch(console.error);
+    },[])
+
+    async function initializeProvider() {
+        try {
+            const user = await axios.get<User>(`${apiRoot}/api/users/me`, {withCredentials: true});
+            setAuthState({loading: false, isAuthenticated: true, user: user.data});
             return;
+        } catch (e) {
+            setAuthState({loading: false, isAuthenticated: false, user: null});
+            if (isAxiosError(e)) {
+                if (e.code === "401") {
+                    return;
+                }
+            }
+            console.error(e);
         }
-        setAuthenticationState(user != null && !user.expired ? "Authenticated" : "Unauthenticated");
-    }, [user]);
-    useEffect(() => {
-        userManager
-            .getUser()
-            .then((user) => {
-                setUser(user);
-            })
-            .catch((e) => setError(e))
-            .finally(() => setLoading(false));
-        userManager.events.addUserSignedOut(handleUserSignedOut);
-        userManager.events.addUserLoaded(handleUserLoaded);
-        return () => {
-            userManager.events.removeUserSignedOut(handleUserSignedOut);
-            userManager.events.removeUserLoaded(handleUserLoaded);
-        };
-    }, []);
-
-    async function handleUserLoaded() {
-        const loadedUser = await userManager.getUser();
-        setUser(loadedUser);
     }
 
-    function handleUserSignedOut() {
-        setUser(null);
+    function loginRedirect(redirectUrl: string) {
+        const redirect = encodeURI(redirectUrl);
+        window.location.href = `${apiRoot}/authorize?redirectUrl=${redirect}`;
     }
 
-    const state = {
-        userManager,
-        user: user ?? null,
-        isAuthenticated: authenticationState === "Authenticated",
-        loading : loading || authenticationState === "Initializing",
-        error,
-    };
     return (
-        <AuthContext.Provider value={state}>
-            <AxiosConfig/>
-            <SilentRefresh />
+        <AuthContext.Provider value={{...authState, loginRedirect}}>
             {children}
         </AuthContext.Provider>
-    );
+    )
 }
 
 export default React.memo(AuthProvider);

@@ -1,4 +1,4 @@
-import {WowClassModel} from "../../domain/models";
+import {WowClassModel} from "../../domain/models/WowClassModel";
 
 export function useWowClasses(): WowClassModel[] {
     const wowClasses: WowClassModel[] = [

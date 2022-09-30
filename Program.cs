@@ -4,14 +4,12 @@ using Buzz.Jewelcrafting.Data;
 using Buzz.Jewelcrafting.Data.Entities;
 using Buzz.Jewelcrafting.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.UseSerilog((ctx, lc) =>
-{
-    lc.ReadFrom.Configuration(ctx.Configuration);
-});
+builder.Host.UseSerilog((ctx, lc) => { lc.ReadFrom.Configuration(ctx.Configuration); });
 // Add services to the container.
 var config = builder.Configuration;
 var discordOptions = config.GetSection("Discord")
@@ -23,7 +21,6 @@ services.AddControllers();
 services.AddAuthentication(opt =>
     {
         opt.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        opt.DefaultChallengeScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
     })
     .AddDiscord(opt =>
     {
@@ -34,22 +31,25 @@ services.AddAuthentication(opt =>
     })
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, opt =>
     {
+        opt.Cookie.IsEssential = true;
         opt.Cookie.Name = "Buzz.Jewelcrafting.Application";
+        opt.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
         opt.Events.OnSigningIn = async context =>
         {
             var userId = context.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
             var username = context.Principal.FindFirstValue(ClaimTypes.Name);
             var database = context.HttpContext.RequestServices.GetRequiredService<BuzzDbContext>();
             var userExists = await database.Users.AnyAsync(x => x.Id == userId);
-            if(userExists)return;
+            if (userExists) return;
             await database.Users.AddAsync(new BuzzUser { Id = userId, Name = username });
             await database.SaveChangesAsync();
         };
     });
-services.AddDbContext<BuzzDbContext>(opt =>
-{
-    opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
-});
+services.AddDbContext<BuzzDbContext>(opt => { opt.UseNpgsql(config.GetConnectionString("DefaultConnection")); });
 
 services
     .AddScoped<UserActionService>()
@@ -62,6 +62,14 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors(opt =>
+{
+    opt
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()
+        .SetIsOriginAllowed(origin => origin.ToLower().Contains("localhost"));
+});
 
 app.MapHealthChecks("/health");
 app.MapControllers();

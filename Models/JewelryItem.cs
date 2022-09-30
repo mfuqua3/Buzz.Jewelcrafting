@@ -5,7 +5,6 @@ namespace Buzz.Jewelcrafting.Models;
 
 public class JewelryItem : IUnique<int>, IItem, IDesign
 {
-    [JsonIgnore]
     public int Id { get; set; }
     public int? Cost { get; set; }
     public string Name { get; set; }
