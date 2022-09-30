@@ -1,6 +1,5 @@
 ﻿using Buzz.Jewelcrafting.Data;
 using Buzz.Jewelcrafting.Data.Entities;
-using Buzz.Jewelcrafting.Utilities;
 
 namespace Buzz.Jewelcrafting.Services;
 

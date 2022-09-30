@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Buzz.Jewelcrafting.Models.Interfaces;
+﻿using Buzz.Jewelcrafting.Models.Interfaces;
 
 namespace Buzz.Jewelcrafting.Data.Entities;
 

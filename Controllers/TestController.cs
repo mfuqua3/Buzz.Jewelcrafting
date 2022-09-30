@@ -1,5 +1,4 @@
-﻿using Buzz.Jewelcrafting.Services;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Buzz.Jewelcrafting.Controllers;

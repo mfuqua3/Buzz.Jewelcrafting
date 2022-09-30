@@ -1,7 +1,5 @@
 ﻿using AspNet.Security.OAuth.Discord;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Buzz.Jewelcrafting.Controllers;
