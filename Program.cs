@@ -68,7 +68,8 @@ app.UseCors(opt =>
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials()
-        .SetIsOriginAllowed(origin => origin.ToLower().Contains("localhost"));
+        .SetIsOriginAllowed(origin => origin.ToLower().Contains("localhost") || 
+                                      origin.ToLower().StartsWith("https://buzz-jewelcrafting.herokuapp.com/"));
 });
 
 app.MapHealthChecks("/health");
